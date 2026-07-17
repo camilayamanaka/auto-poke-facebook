@@ -1,0 +1,40 @@
+(async function autoPoke() {
+  const delay = ms => new Promise(r => setTimeout(r, ms));
+
+  function acharClicavel(el) {
+    let node = el;
+    while (node && node !== document.body) {
+      if (node.tagName === 'A' || node.tagName === 'BUTTON' || node.getAttribute?.('role') === 'button') {
+        return node;
+      }
+      node = node.parentElement;
+    }
+    return null;
+  }
+
+  function getPokeButtons() {
+    const spans = Array.from(document.querySelectorAll('span')).filter(s =>
+      s.children.length === 0 && s.textContent.trim().toLowerCase() === 'poke'
+    );
+    const botoes = spans.map(acharClicavel).filter(Boolean);
+    return Array.from(new Set(botoes)); // remove duplicados
+  }
+
+  let total = 0;
+  let botoes = getPokeButtons();
+
+  if (botoes.length === 0) {
+    console.log('Nenhum botão clicável encontrado a partir do texto "Poke".');
+    return;
+  }
+
+  while (botoes.length > 0) {
+    botoes[0].click();
+    total++;
+    console.log(`Poke ${total} enviado.`);
+    await delay(1000 + Math.random() * 1000);
+    botoes = getPokeButtons();
+  }
+
+  console.log(`Concluído. ${total} pokes enviados no total.`);
+})();
